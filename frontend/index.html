@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-Do List</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink:        #1e2a24;
+    --paper:      #f6f3ea;
+    --card:       #ffffff;
+    --moss:       #3f6b52;
+    --moss-dark:  #2c4f3b;
+    --clay:       #b5563c;
+    --line:       #e4dfd0;
+    --muted:      #8b8878;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    max-width: 480px;
+    margin: 48px auto;
+    padding: 0 20px;
+    background: var(--paper);
+    color: var(--ink);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(30,42,36,0.06) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 0 0 18px 0;
+    color: var(--ink);
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--moss);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .card {
+    background: var(--card);
+    padding: 28px 26px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(30,42,36,0.04), 0 8px 24px rgba(30,42,36,0.06);
+  }
+
+  input {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    padding: 11px 13px;
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--ink);
+    margin-bottom: 10px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  input::placeholder { color: var(--muted); }
+  input:focus {
+    outline: none;
+    border-color: var(--moss);
+    box-shadow: 0 0 0 3px rgba(63,107,82,0.15);
+  }
+
+  button {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: var(--moss);
+    color: #fff;
+    transition: background .15s ease, transform .1s ease;
+  }
+  button:hover { background: var(--moss-dark); }
+  button:active { transform: translateY(1px); }
+  button:focus-visible {
+    outline: 2px solid var(--clay);
+    outline-offset: 2px;
+  }
+
+  #auth-view button { margin-right: 8px; margin-top: 4px; }
+  #auth-view button:nth-of-type(2) {
+    background: transparent;
+    color: var(--moss);
+    border: 1px solid var(--moss);
+  }
+  #auth-view button:nth-of-type(2):hover { background: rgba(63,107,82,0.08); }
+
+  #auth-error, #todo-error {
+    color: var(--clay);
+    font-size: 13px;
+    min-height: 18px;
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  ul { list-style: none; padding: 0; margin: 14px 0 0 0; }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    background: var(--paper);
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    transition: background .15s ease;
+  }
+  li:hover { background: #f0ecdf; }
+
+  .checkmark {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--muted);
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .checkmark:hover { border-color: var(--moss); }
+  .checkmark.done {
+    background: var(--moss);
+    border-color: var(--moss);
+  }
+  .checkmark.done::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .title { flex: 1; font-size: 15px; }
+  .title.done { text-decoration: line-through; color: var(--muted); }
+
+  .remove-btn {
+    background: transparent;
+    color: var(--clay);
+    border: 1px solid var(--clay);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .remove-btn:hover { background: rgba(181,86,60,0.1); }
+
+  #app { display: none; }
+
+  #topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  #topbar button {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    font-weight: 500;
+    font-size: 13px;
+    padding: 7px 12px;
+  }
+  #topbar button:hover { background: #f0ecdf; color: var(--ink); }
+
+  #new-title { margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div id="auth-view" class="card">
+  <span class="eyebrow">Welcome</span>
+  <h2>Login or Register</h2>
+  <input id="username" placeholder="Username (3–20 chars)">
+  <input id="password" type="password" placeholder="Password (min 6 chars)">
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+  <div id="auth-error"></div>
+</div>
+
+<div id="app" class="card">
+  <div id="topbar">
+    <div>
+      <span class="eyebrow">Today</span>
+      <h2>My To-Do List</h2>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+  <input id="new-title" placeholder="New task…">
+  <button onclick="addTodo()">Add</button>
+  <div id="todo-error"></div>
+  <ul id="list"></ul>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
